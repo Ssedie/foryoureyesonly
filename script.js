@@ -57,19 +57,25 @@ const GameState = {
 // Game variables
 let gameActive = false;
 
-// EMAIL CONFIGURATION
-// Replace these with your EmailJS credentials
+// EMAIL CONFIGURATION - UPDATED WITH YOUR CREDENTIALS
 const EMAIL_CONFIG = {
-    serviceID: 'YOUR_SERVICE_ID',      // Get from emailjs.com
-    templateID: 'YOUR_TEMPLATE_ID',    // Get from emailjs.com
-    publicKey: 'YOUR_PUBLIC_KEY',      // Get from emailjs.com
-    yourEmail: 'your-email@example.com' // Your email address
+    serviceID: 'service_is3orie',
+    templateID: 'template_ze8y0q8',
+    publicKey: 'iCdoUlxGfEl_Q9bpA',
+    yourEmail: 'rullodazed@gmail.com'
 };
 
 // Initialize EmailJS
 (function() {
-    if (EMAIL_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
-        emailjs.init(EMAIL_CONFIG.publicKey);
+    try {
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init(EMAIL_CONFIG.publicKey);
+            console.log('✅ EmailJS initialized successfully!');
+        } else {
+            console.error('❌ EmailJS library not loaded');
+        }
+    } catch (error) {
+        console.error('❌ EmailJS initialization failed:', error);
     }
 })();
 
@@ -417,45 +423,63 @@ function confirmDate() {
 
 // Send email with date details
 function sendDateEmail(date, time, activity) {
-    // Check if EmailJS is configured
-    if (EMAIL_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
-        console.log('EmailJS not configured. Date details:', {date, time, activity});
-        return;
-    }
+    console.log('📧 Attempting to send email...');
     
-    // Format the date nicely
-    const dateObj = new Date(date + 'T00:00:00');
-    const formattedDate = dateObj.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
-    
-    // Format time
-    const timeObj = time.split(':');
-    let hours = parseInt(timeObj[0]);
-    const minutes = timeObj[1];
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
-    const formattedTime = `${hours}:${minutes} ${ampm}`;
-    
-    // Email parameters
-    const templateParams = {
-        to_email: EMAIL_CONFIG.yourEmail,
-        date: formattedDate,
-        time: formattedTime,
-        activity: activity || 'Not specified',
-        message: `Great news! They said YES and picked a date!\n\nDate: ${formattedDate}\nTime: ${formattedTime}\nActivity: ${activity || 'Not specified'}`
-    };
-    
-    // Send email
-    emailjs.send(EMAIL_CONFIG.serviceID, EMAIL_CONFIG.templateID, templateParams)
-        .then(function(response) {
-            console.log('Email sent successfully!', response.status, response.text);
-        }, function(error) {
-            console.error('Failed to send email:', error);
+    try {
+        // Check if EmailJS is available
+        if (typeof emailjs === 'undefined') {
+            console.error('❌ EmailJS library not loaded');
+            alert('Email service not available. Please check your internet connection.');
+            return;
+        }
+        
+        // Format the date nicely
+        const dateObj = new Date(date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
         });
+        
+        // Format time
+        const timeObj = time.split(':');
+        let hours = parseInt(timeObj[0]);
+        const minutes = timeObj[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        const formattedTime = `${hours}:${minutes} ${ampm}`;
+        
+        // Email parameters - these match your EmailJS template
+        const templateParams = {
+            to_email: EMAIL_CONFIG.yourEmail,
+            date: formattedDate,
+            time: formattedTime,
+            activity: activity || 'Not specified'
+        };
+        
+        console.log('📤 Sending email with params:', templateParams);
+        
+        // Send email
+        emailjs.send(EMAIL_CONFIG.serviceID, EMAIL_CONFIG.templateID, templateParams)
+            .then(function(response) {
+                console.log('✅ Email sent successfully!', response.status, response.text);
+                console.log('📬 Check your inbox at:', EMAIL_CONFIG.yourEmail);
+            })
+            .catch(function(error) {
+                console.error('❌ Failed to send email:', error);
+                console.error('Error details:', {
+                    serviceID: EMAIL_CONFIG.serviceID,
+                    templateID: EMAIL_CONFIG.templateID,
+                    error: error
+                });
+                alert('Failed to send email notification. But your date is still saved! 💕');
+            });
+            
+    } catch (error) {
+        console.error('❌ Error in sendDateEmail:', error);
+        alert('An error occurred while sending the email. Your date is still saved! 💕');
+    }
 }
 
 // Show date confirmed screen
