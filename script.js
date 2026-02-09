@@ -57,6 +57,22 @@ const GameState = {
 // Game variables
 let gameActive = false;
 
+// EMAIL CONFIGURATION
+// Replace these with your EmailJS credentials
+const EMAIL_CONFIG = {
+    serviceID: 'YOUR_SERVICE_ID',      // Get from emailjs.com
+    templateID: 'YOUR_TEMPLATE_ID',    // Get from emailjs.com
+    publicKey: 'YOUR_PUBLIC_KEY',      // Get from emailjs.com
+    yourEmail: 'your-email@example.com' // Your email address
+};
+
+// Initialize EmailJS
+(function() {
+    if (EMAIL_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+        emailjs.init(EMAIL_CONFIG.publicKey);
+    }
+})();
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     GameState.load();
@@ -391,9 +407,55 @@ function confirmDate() {
     GameState.dateSelected = true;
     GameState.save();
     
+    // Send email with date details
+    sendDateEmail(dateInput, timeInput, activityInput);
+    
     // Show confirmation
     showDateConfirmed();
     celebrate();
+}
+
+// Send email with date details
+function sendDateEmail(date, time, activity) {
+    // Check if EmailJS is configured
+    if (EMAIL_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
+        console.log('EmailJS not configured. Date details:', {date, time, activity});
+        return;
+    }
+    
+    // Format the date nicely
+    const dateObj = new Date(date + 'T00:00:00');
+    const formattedDate = dateObj.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    // Format time
+    const timeObj = time.split(':');
+    let hours = parseInt(timeObj[0]);
+    const minutes = timeObj[1];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const formattedTime = `${hours}:${minutes} ${ampm}`;
+    
+    // Email parameters
+    const templateParams = {
+        to_email: EMAIL_CONFIG.yourEmail,
+        date: formattedDate,
+        time: formattedTime,
+        activity: activity || 'Not specified',
+        message: `Great news! They said YES and picked a date!\n\nDate: ${formattedDate}\nTime: ${formattedTime}\nActivity: ${activity || 'Not specified'}`
+    };
+    
+    // Send email
+    emailjs.send(EMAIL_CONFIG.serviceID, EMAIL_CONFIG.templateID, templateParams)
+        .then(function(response) {
+            console.log('Email sent successfully!', response.status, response.text);
+        }, function(error) {
+            console.error('Failed to send email:', error);
+        });
 }
 
 // Show date confirmed screen
