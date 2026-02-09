@@ -1,6 +1,8 @@
 // Game state management using localStorage
 const GameState = {
     score: 0,
+    photoSeen: false,
+    messageSeen: false,
     gameStarted: false,
     gameCompleted: false,
     answered: false,
@@ -15,6 +17,8 @@ const GameState = {
         if (saved) {
             const state = JSON.parse(saved);
             this.score = state.score || 0;
+            this.photoSeen = state.photoSeen || false;
+            this.messageSeen = state.messageSeen || false;
             this.gameStarted = state.gameStarted || false;
             this.gameCompleted = state.gameCompleted || false;
             this.answered = state.answered || false;
@@ -29,6 +33,8 @@ const GameState = {
     save() {
         localStorage.setItem('valentineGameState', JSON.stringify({
             score: this.score,
+            photoSeen: this.photoSeen,
+            messageSeen: this.messageSeen,
             gameStarted: this.gameStarted,
             gameCompleted: this.gameCompleted,
             answered: this.answered,
@@ -42,6 +48,8 @@ const GameState = {
 
     reset() {
         this.score = 0;
+        this.photoSeen = false;
+        this.messageSeen = false;
         this.gameStarted = false;
         this.gameCompleted = false;
         this.answered = false;
@@ -56,6 +64,8 @@ const GameState = {
 
 // Game variables
 let gameActive = false;
+let musicPlaying = false;
+let bgMusic;
 
 // EMAIL CONFIGURATION - UPDATED WITH YOUR CREDENTIALS
 const EMAIL_CONFIG = {
@@ -86,10 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showCorrectScreen();
     createBackgroundHearts();
     attachEventListeners();
+    setupMusic();
 });
 
 // Attach all event listeners
 function attachEventListeners() {
+    document.getElementById('rememberBtn').addEventListener('click', showMessageScreen);
+    document.getElementById('continueToGameBtn').addEventListener('click', showInitialScreen);
     document.getElementById('startGameBtn').addEventListener('click', startGame);
     document.getElementById('yesBtn').addEventListener('click', () => handleAnswer('yes'));
     document.getElementById('maybeBtn').addEventListener('click', () => handleAnswer('maybe'));
@@ -100,6 +113,7 @@ function attachEventListeners() {
     document.getElementById('confirmDateBtn').addEventListener('click', confirmDate);
     document.getElementById('startOverConfirmed').addEventListener('click', restartEverything);
     document.getElementById('restartBtn').addEventListener('click', restartEverything);
+    document.getElementById('musicToggle').addEventListener('click', toggleMusic);
     
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
@@ -122,8 +136,12 @@ function showCorrectScreen() {
         // Resume game
         gameActive = true;
         spawnHeart();
-    } else {
+    } else if (GameState.messageSeen) {
         document.getElementById('initial-screen').classList.add('active');
+    } else if (GameState.photoSeen) {
+        document.getElementById('message-screen').classList.add('active');
+    } else {
+        document.getElementById('photo-screen').classList.add('active');
     }
 }
 
@@ -152,6 +170,60 @@ function createBackgroundHearts() {
         
         setTimeout(() => heart.remove(), 6000);
     }, 800);
+}
+
+// Music functions
+function setupMusic() {
+    bgMusic = document.getElementById('bgMusic');
+    // Try to autoplay (may be blocked by browser)
+    const playPromise = bgMusic.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            musicPlaying = true;
+            updateMusicButton();
+        }).catch(() => {
+            musicPlaying = false;
+            updateMusicButton();
+        });
+    }
+}
+
+function toggleMusic() {
+    if (musicPlaying) {
+        bgMusic.pause();
+        musicPlaying = false;
+    } else {
+        bgMusic.play();
+        musicPlaying = true;
+    }
+    updateMusicButton();
+}
+
+function updateMusicButton() {
+    const btn = document.getElementById('musicToggle');
+    if (musicPlaying) {
+        btn.textContent = '🔊 Music On';
+        btn.classList.add('playing');
+    } else {
+        btn.textContent = '🔇 Music Off';
+        btn.classList.remove('playing');
+    }
+}
+
+// Show message screen
+function showMessageScreen() {
+    GameState.photoSeen = true;
+    GameState.save();
+    hideAllScreens();
+    document.getElementById('message-screen').classList.add('active');
+}
+
+// Show initial screen (after message)
+function showInitialScreen() {
+    GameState.messageSeen = true;
+    GameState.save();
+    hideAllScreens();
+    document.getElementById('initial-screen').classList.add('active');
 }
 
 // Start the game
@@ -361,6 +433,12 @@ function restartEverything() {
         
         // Reset score display
         document.getElementById('score').textContent = '0';
+        
+        // Restart music if it was playing
+        if (musicPlaying) {
+            bgMusic.currentTime = 0;
+            bgMusic.play();
+        }
         
         showCorrectScreen();
     }

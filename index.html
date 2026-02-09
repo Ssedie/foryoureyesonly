@@ -9,6 +9,13 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="soulfood.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <button class="music-toggle" id="musicToggle">🔇 Music Off</button>
     <button class="restart-btn" id="restartBtn">🔄 Restart</button>
     
     <div class="session-info">
@@ -16,8 +23,51 @@
     </div>
 
     <div class="container">
+        <!-- Photo Memory Screen -->
+        <div id="photo-screen" class="game-section active">
+            <h1>💕 Do You Remember This? 💕</h1>
+            <div class="photo-container">
+                <img id="memoryPhoto" src="our-photo.jpg" alt="Our Memory" class="memory-photo">
+                <p class="photo-caption">This moment... 💖</p>
+            </div>
+            <p class="message">
+                Before we continue...<br>
+                Do you remember this special moment?
+            </p>
+            <button class="yes-btn" id="rememberBtn">Yes, I remember 💕</button>
+        </div>
+
+        <!-- Personal Message Screen -->
+        <div id="message-screen" class="game-section">
+            <div class="big-heart">💝</div>
+            <h1>A Message From My Heart</h1>
+            <div class="personal-message">
+                <p id="personalMessageText">
+                    <!-- Your personal message will go here -->
+                    My dearest,<br><br>
+                    
+                    Every moment with you feels like a dream I never want to wake up from. 
+                    You've brought so much light, joy, and love into my life that I can't imagine 
+                    a single day without you.<br><br>
+                    
+                    From the first time I saw you smile, I knew you were someone special. 
+                    Every laugh we've shared, every conversation, every quiet moment together 
+                    has made me fall deeper in love with you.<br><br>
+                    
+                    You make me want to be a better person. You inspire me, challenge me, 
+                    and support me in ways I never knew I needed. With you, I feel complete.<br><br>
+                    
+                    So today, on this special day, I want to ask you something important...<br><br>
+                    
+                    With all my heart,<br>
+                    Forever yours 💕
+                </p>
+            </div>
+            <button class="yes-btn" id="continueToGameBtn">Continue 💖</button>
+        </div>
+
         <!-- Initial Screen -->
-        <div id="initial-screen" class="game-section active">
+        <div id="initial-screen" class="game-section">
             <h1>💝 A Special Question 💝</h1>
             <p class="message">
                 Before I ask you something important...<br>
@@ -56,7 +106,7 @@
             <p class="message">
                 You just made me the happiest person ever! 💕<br>
                 I promise to cherish every moment with you.<br>
-                Happy Valentine's Day, Ica! 💖
+                Happy Valentine's Day, my Valentine! 💖
             </p>
             <button class="yes-btn" id="pickDateBtn" style="margin-top: 20px;">Pick Our First Date! 📅</button>
         </div>
@@ -99,7 +149,7 @@
                 </div>
                 <p class="message" style="margin-top: 30px;">
                     I'll be counting down the days! 💕<br>
-                    See you then, Ica! 💖
+                    See you then, my Valentine! 💖
                 </p>
             </div>
             <button class="yes-btn" id="startOverConfirmed" style="margin-top: 20px;">Start Over 🔄</button>
