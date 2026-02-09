@@ -269,3 +269,77 @@ button {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(214, 51, 132, 0.5);
 }
+
+.date-picker-container {
+    background: linear-gradient(135deg, #ffe0f0, #ffd4e8);
+    padding: 30px;
+    border-radius: 20px;
+    margin: 30px 0;
+}
+
+.date-picker-container label {
+    display: block;
+    color: #d63384;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.date-picker-container label:first-child {
+    margin-top: 0;
+}
+
+.date-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
+    border: 2px solid #ff69b4;
+    border-radius: 15px;
+    font-family: 'Georgia', serif;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #d63384;
+    box-shadow: 0 0 10px rgba(214, 51, 132, 0.3);
+    transform: scale(1.02);
+}
+
+.date-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    animation: fadeInScale 0.6s ease-out;
+}
+
+.date-icon {
+    font-size: 60px;
+}
+
+.date-info {
+    text-align: left;
+    flex: 1;
+}
+
+.date-info p {
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #666;
+}
+
+.date-info strong {
+    color: #d63384;
+}
+
+.date-info span {
+    color: #333;
+    font-weight: normal;
+}

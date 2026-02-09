@@ -5,6 +5,10 @@ const GameState = {
     gameCompleted: false,
     answered: false,
     answer: '',
+    dateSelected: false,
+    selectedDate: '',
+    selectedTime: '',
+    selectedActivity: '',
 
     load() {
         const saved = localStorage.getItem('valentineGameState');
@@ -15,6 +19,10 @@ const GameState = {
             this.gameCompleted = state.gameCompleted || false;
             this.answered = state.answered || false;
             this.answer = state.answer || '';
+            this.dateSelected = state.dateSelected || false;
+            this.selectedDate = state.selectedDate || '';
+            this.selectedTime = state.selectedTime || '';
+            this.selectedActivity = state.selectedActivity || '';
         }
     },
 
@@ -24,7 +32,11 @@ const GameState = {
             gameStarted: this.gameStarted,
             gameCompleted: this.gameCompleted,
             answered: this.answered,
-            answer: this.answer
+            answer: this.answer,
+            dateSelected: this.dateSelected,
+            selectedDate: this.selectedDate,
+            selectedTime: this.selectedTime,
+            selectedActivity: this.selectedActivity
         }));
     },
 
@@ -34,6 +46,10 @@ const GameState = {
         this.gameCompleted = false;
         this.answered = false;
         this.answer = '';
+        this.dateSelected = false;
+        this.selectedDate = '';
+        this.selectedTime = '';
+        this.selectedActivity = '';
         localStorage.removeItem('valentineGameState');
     }
 };
@@ -58,15 +74,23 @@ function attachEventListeners() {
     document.getElementById('noBtn').addEventListener('mouseover', handleNoHover);
     document.getElementById('maybeToYes').addEventListener('click', () => handleAnswer('yes'));
     document.getElementById('reconsiderBtn').addEventListener('click', backToQuestion);
-    document.getElementById('startOverYes').addEventListener('click', restartEverything);
+    document.getElementById('pickDateBtn').addEventListener('click', showDatePicker);
+    document.getElementById('confirmDateBtn').addEventListener('click', confirmDate);
+    document.getElementById('startOverConfirmed').addEventListener('click', restartEverything);
     document.getElementById('restartBtn').addEventListener('click', restartEverything);
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').setAttribute('min', today);
 }
 
 // Show the correct screen based on game state
 function showCorrectScreen() {
     hideAllScreens();
     
-    if (GameState.answered) {
+    if (GameState.dateSelected) {
+        showDateConfirmed();
+    } else if (GameState.answered) {
         showFinalMessage(GameState.answer);
     } else if (GameState.gameCompleted) {
         document.getElementById('question-screen').classList.add('active');
@@ -335,4 +359,70 @@ function celebrate() {
             setTimeout(() => heart.remove(), 3000);
         }, i * 100);
     }
+}
+
+// Show date picker screen
+function showDatePicker() {
+    hideAllScreens();
+    document.getElementById('date-picker-screen').classList.add('show');
+}
+
+// Confirm the selected date
+function confirmDate() {
+    const dateInput = document.getElementById('dateInput').value;
+    const timeInput = document.getElementById('timeInput').value;
+    const activityInput = document.getElementById('activityInput').value;
+    
+    // Validation
+    if (!dateInput) {
+        alert('Please pick a date! 💕');
+        return;
+    }
+    
+    if (!timeInput) {
+        alert('Please pick a time! ⏰');
+        return;
+    }
+    
+    // Save to state
+    GameState.selectedDate = dateInput;
+    GameState.selectedTime = timeInput;
+    GameState.selectedActivity = activityInput;
+    GameState.dateSelected = true;
+    GameState.save();
+    
+    // Show confirmation
+    showDateConfirmed();
+    celebrate();
+}
+
+// Show date confirmed screen
+function showDateConfirmed() {
+    hideAllScreens();
+    
+    // Format and display the date
+    const dateObj = new Date(GameState.selectedDate + 'T00:00:00');
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = dateObj.toLocaleDateString('en-US', options);
+    
+    // Format time
+    const timeObj = GameState.selectedTime.split(':');
+    let hours = parseInt(timeObj[0]);
+    const minutes = timeObj[1];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const formattedTime = `${hours}:${minutes} ${ampm}`;
+    
+    // Update display
+    document.getElementById('confirmedDate').textContent = formattedDate;
+    document.getElementById('confirmedTime').textContent = formattedTime;
+    
+    if (GameState.selectedActivity) {
+        document.getElementById('confirmedActivity').textContent = GameState.selectedActivity;
+        document.getElementById('confirmedActivityContainer').style.display = 'block';
+    } else {
+        document.getElementById('confirmedActivityContainer').style.display = 'none';
+    }
+    
+    document.getElementById('date-confirmed-screen').classList.add('show');
 }

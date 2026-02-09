@@ -56,7 +56,51 @@
                 I promise to cherish every moment with you.<br>
                 Happy Valentine's Day, my Valentine! 💖
             </p>
-            <button class="yes-btn" id="startOverYes" style="margin-top: 20px;">Start Over 🔄</button>
+            <button class="yes-btn" id="pickDateBtn" style="margin-top: 20px;">Pick Our First Date! 📅</button>
+        </div>
+
+        <!-- Date Picker Screen -->
+        <div class="final-message" id="date-picker-screen">
+            <div class="big-heart">📅💕</div>
+            <h1 style="color: #d63384;">Let's Plan Our Date!</h1>
+            <p class="message">
+                When would you like to go on our special date? 💖
+            </p>
+            
+            <div class="date-picker-container">
+                <label for="dateInput">Choose a date:</label>
+                <input type="date" id="dateInput" class="date-input">
+                
+                <label for="timeInput">What time?</label>
+                <input type="time" id="timeInput" class="date-input">
+                
+                <label for="activityInput">What would you like to do? (Optional)</label>
+                <input type="text" id="activityInput" class="date-input" placeholder="e.g., Dinner, movies, picnic...">
+            </div>
+            
+            <button class="yes-btn" id="confirmDateBtn" style="margin-top: 20px;">Confirm Our Date! 💕</button>
+        </div>
+
+        <!-- Date Confirmed Screen -->
+        <div class="final-message" id="date-confirmed-screen">
+            <div class="big-heart">✨🎉✨</div>
+            <h1 style="color: #d63384;">It's a Date! 💖</h1>
+            <div class="date-details">
+                <p class="message">I can't wait to see you!</p>
+                <div class="date-card">
+                    <div class="date-icon">📅</div>
+                    <div class="date-info">
+                        <p><strong>Date:</strong> <span id="confirmedDate"></span></p>
+                        <p><strong>Time:</strong> <span id="confirmedTime"></span></p>
+                        <p id="confirmedActivityContainer" style="display: none;"><strong>Activity:</strong> <span id="confirmedActivity"></span></p>
+                    </div>
+                </div>
+                <p class="message" style="margin-top: 30px;">
+                    I'll be counting down the days! 💕<br>
+                    See you then, my Valentine! 💖
+                </p>
+            </div>
+            <button class="yes-btn" id="startOverConfirmed" style="margin-top: 20px;">Start Over 🔄</button>
         </div>
 
         <!-- Maybe Message -->
