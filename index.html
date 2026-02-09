@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine? 💝</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="restart-btn" id="restartBtn">🔄 Restart</button>
+    
+    <div class="session-info">
+        💝 Score: <span id="sessionScore">0</span>/10
+    </div>
+
+    <div class="container">
+        <!-- Initial Screen -->
+        <div id="initial-screen" class="game-section active">
+            <h1>💝 A Special Question 💝</h1>
+            <p class="message">
+                Before I ask you something important...<br>
+                Let's see if you can catch my heart first! 💕
+            </p>
+            <button class="start-btn" id="startGameBtn">Start the Game!</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-section" id="game-screen">
+            <h2 style="color: #d63384; margin-bottom: 20px;">Catch 10 Hearts! 💖</h2>
+            <div class="score">Hearts Caught: <span id="score">0</span>/10</div>
+            <div class="heart-catcher" id="game-area"></div>
+            <p class="instruction">Click the hearts as they fall!</p>
+        </div>
+
+        <!-- Question Screen -->
+        <div class="game-section" id="question-screen">
+            <div class="big-heart">💖</div>
+            <h1>Will You Be My Valentine?</h1>
+            <p class="message">
+                You caught my heart in the game...<br>
+                Now, will you keep it forever?
+            </p>
+            <div class="button-container">
+                <button class="yes-btn" id="yesBtn">Yes! 💕</button>
+                <button class="maybe-btn" id="maybeBtn">Maybe... 🤔</button>
+                <button class="no-btn" id="noBtn">No...</button>
+            </div>
+        </div>
+
+        <!-- Yes Message -->
+        <div class="final-message" id="yes-message">
+            <div class="big-heart">💝✨💝</div>
+            <h1 style="color: #d63384;">Yay! 🎉</h1>
+            <p class="message">
+                You just made me the happiest person ever! 💕<br>
+                I promise to cherish every moment with you.<br>
+                Happy Valentine's Day, my Valentine! 💖
+            </p>
+            <button class="yes-btn" id="startOverYes" style="margin-top: 20px;">Start Over 🔄</button>
+        </div>
+
+        <!-- Maybe Message -->
+        <div class="final-message" id="maybe-message">
+            <div class="big-heart">🥺💕</div>
+            <h1 style="color: #9575cd;">I'll take that as a yes! 😊</h1>
+            <p class="message">
+                Maybe means there's hope, right? 💜<br>
+                Let me show you why you should say yes!<br>
+                (Click 'Yes' when you're ready! 💖)
+            </p>
+            <button class="yes-btn" id="maybeToYes" style="margin-top: 20px;">Okay, Yes! 💕</button>
+        </div>
+
+        <!-- No Message -->
+        <div class="final-message" id="no-message">
+            <div class="big-heart">🥺</div>
+            <h1 style="color: #d63384;">Are you sure? 💔</h1>
+            <p class="message">
+                My heart is breaking... 🥺<br>
+                But I'll ask again just in case!
+            </p>
+            <button class="yes-btn" id="reconsiderBtn" style="margin-top: 20px;">Let me reconsider... 💕</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
