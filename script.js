@@ -1,6 +1,7 @@
 // Game state management using localStorage
 const GameState = {
     score: 0,
+    revealClicked: false,
     photoSeen: false,
     messageSeen: false,
     gameStarted: false,
@@ -11,12 +12,14 @@ const GameState = {
     selectedDate: '',
     selectedTime: '',
     selectedActivity: '',
+    messageFullyRevealed: false,
 
     load() {
         const saved = localStorage.getItem('valentineGameState');
         if (saved) {
             const state = JSON.parse(saved);
             this.score = state.score || 0;
+            this.revealClicked = state.revealClicked || false;
             this.photoSeen = state.photoSeen || false;
             this.messageSeen = state.messageSeen || false;
             this.gameStarted = state.gameStarted || false;
@@ -27,12 +30,14 @@ const GameState = {
             this.selectedDate = state.selectedDate || '';
             this.selectedTime = state.selectedTime || '';
             this.selectedActivity = state.selectedActivity || '';
+            this.messageFullyRevealed = state.messageFullyRevealed || false;
         }
     },
 
     save() {
         localStorage.setItem('valentineGameState', JSON.stringify({
             score: this.score,
+            revealClicked: this.revealClicked,
             photoSeen: this.photoSeen,
             messageSeen: this.messageSeen,
             gameStarted: this.gameStarted,
@@ -42,12 +47,14 @@ const GameState = {
             dateSelected: this.dateSelected,
             selectedDate: this.selectedDate,
             selectedTime: this.selectedTime,
-            selectedActivity: this.selectedActivity
+            selectedActivity: this.selectedActivity,
+            messageFullyRevealed: this.messageFullyRevealed
         }));
     },
 
     reset() {
         this.score = 0;
+        this.revealClicked = false;
         this.photoSeen = false;
         this.messageSeen = false;
         this.gameStarted = false;
@@ -58,6 +65,7 @@ const GameState = {
         this.selectedDate = '';
         this.selectedTime = '';
         this.selectedActivity = '';
+        this.messageFullyRevealed = false;
         localStorage.removeItem('valentineGameState');
     }
 };
@@ -66,14 +74,60 @@ const GameState = {
 let gameActive = false;
 let musicPlaying = false;
 let bgMusic;
+let surpriseInterval;
 
-// EMAIL CONFIGURATION - UPDATED WITH YOUR CREDENTIALS
+// EMAIL CONFIGURATION
 const EMAIL_CONFIG = {
     serviceID: 'service_is3orie',
     templateID: 'template_ze8y0q8',
     publicKey: 'iCdoUlxGfEl_Q9bpA',
     yourEmail: 'rullodazed@gmail.com'
 };
+
+// Sweet romantic compliments and messages
+const SURPRISE_MESSAGES = [
+    "You make my heart skip a beat 💕",
+    "Every moment spent with you is precious 💖",
+    "You're the reason I smile 😊",
+    "Thinking of you always 💭💕",
+    "You light up my world ✨",
+    "My heart belongs to you 💝",
+    "I feel so lucky to have you 🍀💕",
+    "You're absolutely amazing 🌟",
+    "Can't stop thinking about you 💫",
+    "You make everything better 🌈",
+    "You're my favorite person 💕",
+    "I love the way you smile 🥰",
+    "You're always on my mind 💭",
+    "You mean the world to me 🌍💖",
+    "Forever grateful for you 🙏💕",
+    "You're one in a million ✨"
+];
+
+// Encouragement messages during game
+const GAME_ENCOURAGEMENTS = [
+    "You're doing great! 💕",
+    "Almost there! 💖",
+    "Keep going, you've got this! ✨",
+    "So close! 🌟",
+    "You're amazing! 💝"
+];
+
+// The personal message to be revealed gradually
+const PERSONAL_MESSAGE = `To the one who is always in my mind,
+
+It's been a while, but yes, you still run around my mind like the wind.
+
+I hope you had a great day. I have so much to say to you, but I think I'll reserve it for when we meet personally.
+
+This is just me doing something out of the blue. Truthfully, I have never had anyone that special after you. It was just me focusing on the things that make it worthwhile I would say. Also, it made me look at myself, and reflect on some things.
+
+But that's enough about me, this is all about you.
+
+So today, I want to ask you something important...
+
+With all my heart and shyness,
+Zed 💕`;
 
 // Initialize EmailJS
 (function() {
@@ -97,10 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     createBackgroundHearts();
     attachEventListeners();
     setupMusic();
+    startSurpriseMessages();
 });
 
 // Attach all event listeners
 function attachEventListeners() {
+    document.getElementById('revealBtn').addEventListener('click', revealPhoto);
     document.getElementById('rememberBtn').addEventListener('click', showMessageScreen);
     document.getElementById('continueToGameBtn').addEventListener('click', showInitialScreen);
     document.getElementById('startGameBtn').addEventListener('click', startGame);
@@ -114,10 +170,64 @@ function attachEventListeners() {
     document.getElementById('startOverConfirmed').addEventListener('click', restartEverything);
     document.getElementById('restartBtn').addEventListener('click', restartEverything);
     document.getElementById('musicToggle').addEventListener('click', toggleMusic);
+    document.getElementById('surpriseClose').addEventListener('click', closeSurprise);
     
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('dateInput').setAttribute('min', today);
+}
+
+// Start random surprise messages
+function startSurpriseMessages() {
+    // Show surprise messages every 30-60 seconds
+    surpriseInterval = setInterval(() => {
+        if (Math.random() > 0.3) { // 70% chance
+            showSurpriseMessage();
+        }
+    }, 45000); // Every 45 seconds
+}
+
+// Show a random surprise message
+function showSurpriseMessage() {
+    const message = SURPRISE_MESSAGES[Math.floor(Math.random() * SURPRISE_MESSAGES.length)];
+    const popup = document.getElementById('surprisePopup');
+    const text = document.getElementById('surpriseText');
+    
+    text.textContent = message;
+    popup.classList.add('show');
+    
+    // Create confetti effect
+    createConfetti();
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        popup.classList.remove('show');
+    }, 4000);
+}
+
+// Close surprise popup
+function closeSurprise() {
+    document.getElementById('surprisePopup').classList.remove('show');
+}
+
+// Create confetti effect
+function createConfetti() {
+    const colors = ['#ff69b4', '#ff1493', '#ffc0cb', '#ffb6c1', '#ff69b4'];
+    const shapes = ['❤️', '💕', '💖', '💗', '💝', '✨', '🌟'];
+    
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.innerHTML = shapes[Math.floor(Math.random() * shapes.length)];
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 4000);
+        }, i * 50);
+    }
 }
 
 // Show the correct screen based on game state
@@ -133,15 +243,34 @@ function showCorrectScreen() {
     } else if (GameState.gameStarted) {
         document.getElementById('game-screen').classList.add('active');
         document.getElementById('score').textContent = GameState.score;
-        // Resume game
         gameActive = true;
         spawnHeart();
     } else if (GameState.messageSeen) {
         document.getElementById('initial-screen').classList.add('active');
     } else if (GameState.photoSeen) {
         document.getElementById('message-screen').classList.add('active');
-    } else {
+        if (GameState.messageFullyRevealed) {
+            document.getElementById('personalMessageText').textContent = PERSONAL_MESSAGE;
+            document.getElementById('continueToGameBtn').classList.remove('hidden');
+            document.getElementById('typingIndicator').style.display = 'none';
+        } else {
+            startTypewriter();
+        }
+    } else if (GameState.revealClicked) {
         document.getElementById('photo-screen').classList.add('active');
+        // Show the photo with animation
+        const photo = document.getElementById('memoryPhoto');
+        const caption = document.querySelector('.photo-caption');
+        setTimeout(() => {
+            photo.classList.remove('hidden');
+            photo.classList.add('fade-in');
+        }, 300);
+        setTimeout(() => {
+            caption.classList.remove('hidden');
+            caption.classList.add('fade-in');
+        }, 800);
+    } else {
+        document.getElementById('reveal-screen').classList.add('active');
     }
 }
 
@@ -175,7 +304,6 @@ function createBackgroundHearts() {
 // Music functions
 function setupMusic() {
     bgMusic = document.getElementById('bgMusic');
-    // Try to autoplay (may be blocked by browser)
     const playPromise = bgMusic.play();
     if (playPromise !== undefined) {
         playPromise.then(() => {
@@ -210,12 +338,91 @@ function updateMusicButton() {
     }
 }
 
+// Typewriter effect for personal message
+function startTypewriter() {
+    const textElement = document.getElementById('personalMessageText');
+    const continueBtn = document.getElementById('continueToGameBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    textElement.textContent = '';
+    continueBtn.classList.add('hidden');
+    typingIndicator.style.display = 'block';
+    
+    let charIndex = 0;
+    const speed = 50; // Milliseconds per character
+    
+    function type() {
+        if (charIndex < PERSONAL_MESSAGE.length) {
+            textElement.textContent += PERSONAL_MESSAGE.charAt(charIndex);
+            charIndex++;
+            setTimeout(type, speed);
+        } else {
+            // Message fully revealed
+            typingIndicator.style.display = 'none';
+            continueBtn.classList.remove('hidden');
+            continueBtn.classList.add('fade-in');
+            GameState.messageFullyRevealed = true;
+            GameState.save();
+            
+            // Show a special surprise message
+            setTimeout(() => {
+                showSurpriseMessage();
+            }, 1000);
+        }
+    }
+    
+    type();
+}
+
+// Reveal photo screen
+function revealPhoto() {
+    GameState.revealClicked = true;
+    GameState.save();
+    hideAllScreens();
+    document.getElementById('photo-screen').classList.add('active');
+    
+    // Show a special surprise before revealing
+    setTimeout(() => {
+        const messages = [
+            "Here's a memory close to my heart... 💕",
+            "This moment means everything to me 💖",
+            "A picture worth a thousand words... ✨"
+        ];
+        const popup = document.getElementById('surprisePopup');
+        const text = document.getElementById('surpriseText');
+        text.textContent = messages[Math.floor(Math.random() * messages.length)];
+        popup.classList.add('show');
+        
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 3000);
+    }, 500);
+    
+    // Reveal photo with animation
+    const photo = document.getElementById('memoryPhoto');
+    const caption = document.querySelector('.photo-caption');
+    
+    setTimeout(() => {
+        photo.classList.remove('hidden');
+        photo.classList.add('fade-in');
+    }, 300);
+    
+    setTimeout(() => {
+        caption.classList.remove('hidden');
+        caption.classList.add('fade-in');
+    }, 1000);
+}
+
 // Show message screen
 function showMessageScreen() {
     GameState.photoSeen = true;
     GameState.save();
     hideAllScreens();
     document.getElementById('message-screen').classList.add('active');
+    
+    if (!GameState.messageFullyRevealed) {
+        startTypewriter();
+    }
 }
 
 // Show initial screen (after message)
@@ -271,15 +478,34 @@ function spawnHeart() {
         heart.remove();
         clearInterval(fall);
         
-        if (GameState.score >= 10) {
+        // Show encouragement at milestones
+        if (GameState.score === 1 || GameState.score === 2) {
+            showEncouragement();
+        }
+        
+        if (GameState.score >= 3) {
             gameActive = false;
             GameState.gameCompleted = true;
             GameState.save();
+            createConfetti();
             setTimeout(showQuestion, 500);
         } else {
             spawnHeart();
         }
     };
+}
+
+// Show encouragement message during game
+function showEncouragement() {
+    const encouragementMsg = document.getElementById('encouragementMsg');
+    const message = GAME_ENCOURAGEMENTS[Math.floor(Math.random() * GAME_ENCOURAGEMENTS.length)];
+    
+    encouragementMsg.textContent = message;
+    encouragementMsg.classList.add('show');
+    
+    setTimeout(() => {
+        encouragementMsg.classList.remove('show');
+    }, 2000);
 }
 
 // Create sparkle effects
@@ -345,45 +571,37 @@ function handleNoHover(event) {
     const noBtn = document.getElementById('noBtn');
     const rect = noBtn.getBoundingClientRect();
     
-    // Check if button is already off screen
     if (rect.right < 0 || rect.left > window.innerWidth || 
         rect.bottom < 0 || rect.top > window.innerHeight) {
-        // Button is off screen, submit the "no" answer
         handleAnswer('no');
         return;
     }
     
-    // Make button fixed position if not already
     if (!noBtn.classList.contains('running-away')) {
         noBtn.classList.add('running-away');
         noBtn.style.left = rect.left + 'px';
         noBtn.style.top = rect.top + 'px';
     }
     
-    // Calculate new position - move away from mouse
     const mouseX = event.clientX;
     const mouseY = event.clientY;
     const btnCenterX = rect.left + rect.width / 2;
     const btnCenterY = rect.top + rect.height / 2;
     
-    // Calculate direction away from mouse
     const deltaX = btnCenterX - mouseX;
     const deltaY = btnCenterY - mouseY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    // Normalize and multiply by movement distance
     const moveDistance = 150;
     const moveX = (deltaX / distance) * moveDistance;
     const moveY = (deltaY / distance) * moveDistance;
     
-    // Apply new position
     const currentLeft = parseFloat(noBtn.style.left) || rect.left;
     const currentTop = parseFloat(noBtn.style.top) || rect.top;
     
     noBtn.style.left = (currentLeft + moveX) + 'px';
     noBtn.style.top = (currentTop + moveY) + 'px';
     
-    // Add some rotation for fun
     const currentRotation = parseInt(noBtn.getAttribute('data-rotation') || '0');
     const newRotation = currentRotation + 15;
     noBtn.setAttribute('data-rotation', newRotation);
@@ -396,7 +614,6 @@ function backToQuestion() {
     GameState.answer = '';
     GameState.save();
     
-    // Reset the No button
     const noBtn = document.getElementById('noBtn');
     noBtn.classList.remove('running-away');
     noBtn.style.left = '';
@@ -415,7 +632,6 @@ function restartEverything() {
         GameState.reset();
         updateSessionDisplay();
         
-        // Reset the No button
         const noBtn = document.getElementById('noBtn');
         if (noBtn) {
             noBtn.classList.remove('running-away');
@@ -425,16 +641,13 @@ function restartEverything() {
             noBtn.removeAttribute('data-rotation');
         }
         
-        // Clear game area
         const gameArea = document.getElementById('game-area');
         if (gameArea) {
             gameArea.innerHTML = '';
         }
         
-        // Reset score display
         document.getElementById('score').textContent = '0';
         
-        // Restart music if it was playing
         if (musicPlaying) {
             bgMusic.currentTime = 0;
             bgMusic.play();
@@ -446,6 +659,7 @@ function restartEverything() {
 
 // Celebration effect
 function celebrate() {
+    createConfetti();
     for (let i = 0; i < 50; i++) {
         setTimeout(() => {
             const heart = document.createElement('div');
@@ -473,7 +687,6 @@ function confirmDate() {
     const timeInput = document.getElementById('timeInput').value;
     const activityInput = document.getElementById('activityInput').value;
     
-    // Validation
     if (!dateInput) {
         alert('Please pick a date! 💕');
         return;
@@ -484,17 +697,13 @@ function confirmDate() {
         return;
     }
     
-    // Save to state
     GameState.selectedDate = dateInput;
     GameState.selectedTime = timeInput;
     GameState.selectedActivity = activityInput;
     GameState.dateSelected = true;
     GameState.save();
     
-    // Send email with date details
     sendDateEmail(dateInput, timeInput, activityInput);
-    
-    // Show confirmation
     showDateConfirmed();
     celebrate();
 }
@@ -504,14 +713,12 @@ function sendDateEmail(date, time, activity) {
     console.log('📧 Attempting to send email...');
     
     try {
-        // Check if EmailJS is available
         if (typeof emailjs === 'undefined') {
             console.error('❌ EmailJS library not loaded');
             alert('Email service not available. Please check your internet connection.');
             return;
         }
         
-        // Format the date nicely
         const dateObj = new Date(date + 'T00:00:00');
         const formattedDate = dateObj.toLocaleDateString('en-US', { 
             weekday: 'long', 
@@ -520,7 +727,6 @@ function sendDateEmail(date, time, activity) {
             day: 'numeric' 
         });
         
-        // Format time
         const timeObj = time.split(':');
         let hours = parseInt(timeObj[0]);
         const minutes = timeObj[1];
@@ -528,7 +734,6 @@ function sendDateEmail(date, time, activity) {
         hours = hours % 12 || 12;
         const formattedTime = `${hours}:${minutes} ${ampm}`;
         
-        // Email parameters - these match your EmailJS template
         const templateParams = {
             to_email: EMAIL_CONFIG.yourEmail,
             date: formattedDate,
@@ -538,7 +743,6 @@ function sendDateEmail(date, time, activity) {
         
         console.log('📤 Sending email with params:', templateParams);
         
-        // Send email
         emailjs.send(EMAIL_CONFIG.serviceID, EMAIL_CONFIG.templateID, templateParams)
             .then(function(response) {
                 console.log('✅ Email sent successfully!', response.status, response.text);
@@ -546,11 +750,6 @@ function sendDateEmail(date, time, activity) {
             })
             .catch(function(error) {
                 console.error('❌ Failed to send email:', error);
-                console.error('Error details:', {
-                    serviceID: EMAIL_CONFIG.serviceID,
-                    templateID: EMAIL_CONFIG.templateID,
-                    error: error
-                });
                 alert('Failed to send email notification. But your date is still saved! 💕');
             });
             
@@ -564,12 +763,10 @@ function sendDateEmail(date, time, activity) {
 function showDateConfirmed() {
     hideAllScreens();
     
-    // Format and display the date
     const dateObj = new Date(GameState.selectedDate + 'T00:00:00');
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const formattedDate = dateObj.toLocaleDateString('en-US', options);
     
-    // Format time
     const timeObj = GameState.selectedTime.split(':');
     let hours = parseInt(timeObj[0]);
     const minutes = timeObj[1];
@@ -577,7 +774,6 @@ function showDateConfirmed() {
     hours = hours % 12 || 12;
     const formattedTime = `${hours}:${minutes} ${ampm}`;
     
-    // Update display
     document.getElementById('confirmedDate').textContent = formattedDate;
     document.getElementById('confirmedTime').textContent = formattedTime;
     

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will You Be My Valentine? 💝</title>
+    <title>A Sweet Surprise... 💝</title>
     <link rel="stylesheet" href="style.css">
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -19,16 +19,37 @@
     <button class="restart-btn" id="restartBtn">🔄 Restart</button>
     
     <div class="session-info">
-        💝 Score: <span id="sessionScore">0</span>/10
+        💝 Score: <span id="sessionScore">0</span>/3
+    </div>
+
+    <!-- Surprise Popup Container -->
+    <div class="surprise-popup" id="surprisePopup">
+        <div class="surprise-content">
+            <span class="surprise-close" id="surpriseClose">×</span>
+            <div class="surprise-heart">💕</div>
+            <p class="surprise-text" id="surpriseText"></p>
+        </div>
     </div>
 
     <div class="container">
+        <!-- Initial Reveal Screen -->
+        <div id="reveal-screen" class="game-section active">
+            <div class="big-heart">💝</div>
+            <h1>A Special Surprise Awaits... 💕</h1>
+            <p class="message">
+                I have something to show you...<br>
+                Something that holds a special place in my heart.<br><br>
+                Are you ready?
+            </p>
+            <button class="yes-btn" id="revealBtn">Reveal the Surprise 💖</button>
+        </div>
+
         <!-- Photo Memory Screen -->
-        <div id="photo-screen" class="game-section active">
+        <div id="photo-screen" class="game-section">
             <h1>💕 Do You Remember This? 💕</h1>
             <div class="photo-container">
-                <img id="memoryPhoto" src="our-photo.jpg" alt="Our Memory" class="memory-photo">
-                <p class="photo-caption">This moment... 💖</p>
+                <img id="memoryPhoto" src="our-photo.jpg" alt="Our Memory" class="memory-photo hidden">
+                <p class="photo-caption hidden">This moment... 💖</p>
             </div>
             <p class="message">
                 Before we continue...<br>
@@ -37,29 +58,19 @@
             <button class="yes-btn" id="rememberBtn">Yes, I remember 💕</button>
         </div>
 
-        <!-- Personal Message Screen -->
+        <!-- Personal Message Screen with Typewriter Effect -->
         <div id="message-screen" class="game-section">
             <div class="big-heart">💝</div>
             <h1>A Message From My Heart</h1>
             <div class="personal-message">
-                <p id="personalMessageText">
-                    To the one who is always in my mind,<br><br>
-                    
-                    It's been a while, but yes, you still run around my mind like the wind.<br><br>
-                    
-                    I hope you had a great day, I have so much to say to you, but I think i'll reserve it for when we meet personally.<br><br>
-                    
-                    This is just me doing something out of the blue. Truthfully, I have never had anyone that special after you,
-                    it was just me focusing on the things that make it worthwhile I would say, also, it made me look at myself, and reflect one some things.
-                    But that's enough about me, this is all about you. <br><br>
-                    
-                    So today, I want to ask you something important...<br><br>
-                    
-                    With all my heart and shyness,<br>
-                    Zed 💕
+                <p id="personalMessageText" class="typewriter-text">
+                    <!-- Text will be revealed gradually by JavaScript -->
                 </p>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span><span></span><span></span>
+                </div>
             </div>
-            <button class="yes-btn" id="continueToGameBtn">Continue 💖</button>
+            <button class="yes-btn hidden" id="continueToGameBtn">Continue 💖</button>
         </div>
 
         <!-- Initial Screen -->
@@ -74,10 +85,11 @@
 
         <!-- Game Screen -->
         <div class="game-section" id="game-screen">
-            <h2 style="color: #d63384; margin-bottom: 20px;">Catch 10 Hearts! 💖</h2>
-            <div class="score">Hearts Caught: <span id="score">0</span>/10</div>
+            <h2 style="color: #d63384; margin-bottom: 20px;">Catch 3 Hearts! 💖</h2>
+            <div class="score">Hearts Caught: <span id="score">0</span>/3</div>
             <div class="heart-catcher" id="game-area"></div>
             <p class="instruction">Click the hearts as they fall!</p>
+            <div class="encouragement-message" id="encouragementMsg"></div>
         </div>
 
         <!-- Question Screen -->
